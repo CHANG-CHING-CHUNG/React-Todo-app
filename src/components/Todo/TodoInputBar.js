@@ -1,17 +1,10 @@
 import styled from 'styled-components';
-import { useState } from 'react';
 
 
-function MyTodoInputBar({ className }) {
 
-  const [inputValue, setInputValue] = useState('');
 
-  return (
-    <input value={ inputValue } onChange={ (e) => setInputValue(e.target.value) } placeholder="New Task" type="text" className={ className }/>
-  )
-}
 
-const TodoInputBar = styled(MyTodoInputBar)`
+const TodoInputBar = styled.input`
   background-color: transparent;
   border: none;
   border-bottom: 1px solid #9e9e9e;

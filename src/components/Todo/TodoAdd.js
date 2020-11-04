@@ -1,14 +1,7 @@
 import styled from 'styled-components';
 
-function myTodoAdd({ className, children, addTodo }) {
-  return (
-    <button className={ className }>
-      {children}
-    </button>
-  )
-}
 
-const TodoAdd = styled(myTodoAdd)`
+const TodoAdd = styled.button`
   margin-right: 1rem;
   text-decoration: none;
   color: #fff;

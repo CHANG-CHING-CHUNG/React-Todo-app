@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import TodoInputSection from './TodoInputSection';
 import TodoTitle from './TodoTitle';
 import TodoInputField from './TodoInputField';
@@ -46,6 +46,25 @@ function Todo() {
     ]
     );
 
+    const [inputValue, setInputValue] = useState('');
+    const input = useRef();
+
+    function addTodo(newValue) {
+      setTodos([
+        ...todos,
+        {
+          todo:newValue,
+          isDone: false,
+          id:id
+        }
+      ]);
+      id++;
+    }
+
+    function deleteTodo(id) {
+      setTodos(todos.filter((todo) => todo.id !== id ))
+    }
+
     
 
   return (
@@ -55,15 +74,10 @@ function Todo() {
         Things must be done
         </TodoTitle>
         <TodoInputField>
-          <TodoInputBar />
+          <TodoInputBar ref={ input } value={ inputValue } onChange={ (e) => setInputValue(e.target.value) } placeholder="New Task" type="text" />
           <TodoBtnWrapper>
             <TodoRow>
-              <TodoAdd addTodo={(todo => {
-                setTodos({
-                  ...todos,
-                  todo
-                })
-              })}>
+              <TodoAdd onClick={() => addTodo(input.current.value)}>
                 Add
               </TodoAdd>
               <TodoSearch>
@@ -92,18 +106,20 @@ function Todo() {
       {
         todos.map((todo) => {
           return (
-            <div>
+            <div data-todo-id={ todo.id} key={ todo.id }>
               <TodoItem>
                 <TodoLeft>
                   <TodoCheckBox type="checkbox"/>
-                  <TodoText todo={ todo }/>
+                  <TodoText>
+                    {todo.todo}
+                  </TodoText>
                 </TodoLeft>
 
                 <TodoRight>
                   <TodoEdit>
                     Edit
                   </TodoEdit>
-                  <TodoDelete>
+                  <TodoDelete onClick={ () => deleteTodo(todo.id) }>
                     Del
                   </TodoDelete>
                 </TodoRight>
