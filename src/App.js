@@ -1,10 +1,19 @@
+import { ResetStyle } from './GlobalStyle'
+import PageContainer from './containers/PageContainer';
+import Todo from './components/Todo/Todo';
+import Header from './components/Header/Header';
+import Footer from './components/Footer/Footer';
 
-import Todo from './Todo'
 
 function App() {
   return (
     <div className="App">
-    <Todo/>
+    <ResetStyle/>
+    <PageContainer>
+      <Header/>
+      <Todo/>
+      <Footer/>
+    </PageContainer>
     </div>
   );
 }
