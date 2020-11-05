@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 
-const TodoCheckBox = styled.input`
+const TodoCheckBox = styled.input.attrs(props => ({
+  className: props.className
+}))`
   margin-right: 3rem;
   transform: scale(1.3);
   cursor: pointer;
