@@ -25,9 +25,10 @@ import TodoSave from './TodoSave';
 import TodoCancell from './TodoCancell';
 
 let id = 4;
-let isChecked = false;
 function Todo() {
-
+  const input = useRef();
+  const editTextRef = useRef();
+  let [activeStatus, setActive] = useState('all');
   const [todos, setTodos] = useState(
     [
       {
@@ -44,7 +45,7 @@ function Todo() {
       },
       {
         todo: '測試3',
-        isDone: false,
+        isDone: true,
         isEditing: false,
         id:3
       },
@@ -53,8 +54,6 @@ function Todo() {
     );
 
     const [inputValue, setInputValue] = useState('');
-    const input = useRef();
-    const editTextRef = useRef();
 
     const [editingInputValue, setEditingInputValue] = useState('');
     
@@ -127,7 +126,7 @@ function Todo() {
       setTodos(todos.filter((todo) => todo.id !== id ))
     }
 
-    let [activeStatus, setActive] = useState('all');
+    
 
     function showActive() {
       activeStatus = 'active';
@@ -144,6 +143,17 @@ function Todo() {
       setActive(activeStatus)
     }
 
+    function showSearch() {
+      if(activeStatus !== 'search') {
+        activeStatus = 'search';
+        setActive(activeStatus)
+      }
+    }
+
+    function clearAll() {
+      setTodos([]);
+    }
+
     function handleToggleTodoState(todoId) {
      const newTodos = todos.map(todo => {
        if(todo.id === todoId){
@@ -155,19 +165,28 @@ function Todo() {
      setTodos(newTodos);
     }
 
-   function handleSetChecked(e, todoId) {
-    e.target.checked = e.target.checked ? false : true;
-    console.log(e.target.checked)
-    console.log(e.target)
-    const text = document.querySelector(`.todo`+ todoId);
-    text.classList.toggle('line-through')
-    handleToggleTodoState(todoId)
+   function handleSetChecked(e, todoId,todoIsDone) {
+    if( !todoIsDone ) {
+      const text = document.querySelector(`.todo`+ todoId);
+      text.classList.add('line-through')
+      const checkBox = document.querySelector(`.todo-box`+ todoId);
+      checkBox.checked = true;
+    } else {
+      const text = document.querySelector(`.todo`+ todoId);
+      text.classList.remove('line-through')
+      const checkBox = document.querySelector(`.todo-box`+ todoId);
+      checkBox.checked = false;
+    }
+     handleToggleTodoState(todoId)
    }
 
    function initLineThrough() {
     todos.forEach((todo) => {
       if( todo.isDone ) {
         const text = document.querySelector(`.todo`+ todo.id);
+        if (text === null) {
+          return
+        }
         text.classList.add('line-through')
         const checkBox = document.querySelector(`.todo-box`+ todo.id);
         checkBox.checked = true;
@@ -175,165 +194,104 @@ function Todo() {
     })
    }
 
+   function displayTodos(todo) {
+    return  (
+      <div data-todo-isdone={ todo.isDone } data-todo-isediting={ todo.isEditing } data-todo-id={ todo.id} key={ todo.id }>
+        <TodoItem>
+          <TodoLeft>
+            <TodoCheckBox  className={'todo-box'+todo.id} onClick={(e) => handleSetChecked(e,todo.id,todo.isDone)} type="checkbox"/>
+            {
+              todo.isEditing 
+              ?
+              <TodoEditText ref={editTextRef} value={ editingInputValue || todo.todo } onChange= { handleSetEditingTodoValue } />
+              :
+              <TodoText className={'todo'+todo.id}>
+                {todo.todo}
+              </TodoText>
+            }
+          </TodoLeft>
+
+          <TodoRight>
+          {
+            todo.isEditing 
+              ?
+              <TodoRight>
+                <TodoSave onClick={() => handleSaveEdit(todo.id)}>
+                  Save
+                </TodoSave>
+
+                <TodoCancell onClick={ () => handleCancellEdit(todo.id)}>
+                  Cancell
+                </TodoCancell>
+              </TodoRight>
+              :
+              todo.isDone
+              ?
+              <TodoRight>
+                <TodoDelete onClick={ () => deleteTodo(todo.id) }>
+                  Del
+                </TodoDelete>
+              </TodoRight>
+              :
+              <TodoRight>
+                
+                <TodoEdit onClick={() => handleToggleEdit(todo.id) }>
+                Edit
+                </TodoEdit>
+
+                <TodoDelete onClick={ () => deleteTodo(todo.id) }>
+                  Del
+                </TodoDelete>
+              </TodoRight>
+          }
+          </TodoRight>
+        </TodoItem>
+      </div>
+      )
+   }
+  
    useEffect(() => {
-    if(activeStatus === 'all') {
-      initLineThrough()
-    } else if(activeStatus === 'done') {
-      initLineThrough()
-    }
-   },[activeStatus])
+     if(activeStatus === 'all') {
+       initLineThrough()
+      } else if(activeStatus === 'done') {
+        initLineThrough()
+      } else if(activeStatus === 'search') {
+        initLineThrough()
+      }
+      // eslint-disable-next-line
+   })
 
 
 
 
     function conditionalRender() {
       if(activeStatus === 'active') {
+         // eslint-disable-next-line
         return todos.map((todo) => {
           if(todo.isDone === false) {
-            return  (
-            <div data-todo-isdone={ todo.isDone } data-todo-isediting={ todo.isEditing } data-todo-id={ todo.id} key={ todo.id }>
-              <TodoItem>
-                <TodoLeft>
-                  <TodoCheckBox  className={'todo-box'+todo.id} onClick={(e) => handleSetChecked(e,todo.id)} type="checkbox"/>
-                  {
-                    todo.isEditing 
-                    ?
-                    <TodoEditText ref={editTextRef} value={ editingInputValue || todo.todo } onChange= { handleSetEditingTodoValue } />
-                    :
-                    <TodoText className={'todo'+todo.id}>
-                      {todo.todo}
-                    </TodoText>
-                  }
-                </TodoLeft>
-
-                <TodoRight>
-                {
-                  todo.isEditing 
-                    ?
-                    <TodoRight>
-                      <TodoSave onClick={() => handleSaveEdit(todo.id)}>
-                        Save
-                      </TodoSave>
-
-                      <TodoCancell onClick={ () => handleCancellEdit(todo.id)}>
-                        Cancell
-                      </TodoCancell>
-                    </TodoRight>
-                    :
-                    <TodoRight>
-                      <TodoEdit onClick={() => handleToggleEdit(todo.id) }>
-                      Edit
-                      </TodoEdit>
-
-                      <TodoDelete onClick={ () => deleteTodo(todo.id) }>
-                        Del
-                      </TodoDelete>
-                    </TodoRight>
-                }
-                </TodoRight>
-              </TodoItem>
-            </div>
-            )
+            return displayTodos(todo)
           }
         })
       } else if (activeStatus === 'all') {
         return todos.map((todo) => {
-            return (
-              <div data-todo-isdone={ todo.isDone } data-todo-isediting={ todo.isEditing } data-todo-id={ todo.id} key={ todo.id }>
-                <TodoItem>
-                  <TodoLeft>
-                    <TodoCheckBox  className={'todo-box'+todo.id} onClick={(e) => handleSetChecked(e,todo.id)} type="checkbox"/>
-                    {
-                      todo.isEditing 
-                      ?
-                      <TodoEditText ref={editTextRef} value={ editingInputValue || todo.todo } onChange= { handleSetEditingTodoValue } />
-                      :
-                      <TodoText className={'todo'+todo.id}>
-                        {todo.todo}
-                      </TodoText>
-                    }
-                  </TodoLeft>
-
-                  <TodoRight>
-                  {
-                    todo.isEditing 
-                      ?
-                      <TodoRight>
-                        <TodoSave onClick={() => handleSaveEdit(todo.id)}>
-                          Save
-                        </TodoSave>
-
-                        <TodoCancell onClick={ () => handleCancellEdit(todo.id)}>
-                          Cancell
-                        </TodoCancell>
-                      </TodoRight>
-                      :
-                      <TodoRight>
-                        <TodoEdit onClick={() => handleToggleEdit(todo.id) }>
-                        Edit
-                        </TodoEdit>
-
-                        <TodoDelete onClick={ () => deleteTodo(todo.id) }>
-                          Del
-                        </TodoDelete>
-                      </TodoRight>
-                  }
-                  </TodoRight>
-                </TodoItem>
-              </div>
-            )
+          return displayTodos(todo)
         })
   
       } else if(activeStatus === 'done') {
+         // eslint-disable-next-line
           return todos.map((todo) => {
               if (todo.isDone === true) {
-                return (
-                  <div data-todo-isdone={ todo.isDone } data-todo-isediting={ todo.isEditing } data-todo-id={ todo.id} key={ todo.id }>
-                    <TodoItem>
-                      <TodoLeft>
-                        <TodoCheckBox  className={'todo-box'+todo.id} onClick={(e) => handleSetChecked(e,todo.id)} type="checkbox"/>
-                        {
-                          todo.isEditing 
-                          ?
-                          <TodoEditText ref={editTextRef} value={ editingInputValue || todo.todo } onChange= { handleSetEditingTodoValue } />
-                          :
-                          <TodoText className={'todo'+todo.id}>
-                            {todo.todo}
-                          </TodoText>
-                        }
-                      </TodoLeft>
-      
-                      <TodoRight>
-                      {
-                        todo.isEditing 
-                          ?
-                          <TodoRight>
-                            <TodoSave onClick={() => handleSaveEdit(todo.id)}>
-                              Save
-                            </TodoSave>
-      
-                            <TodoCancell onClick={ () => handleCancellEdit(todo.id)}>
-                              Cancell
-                            </TodoCancell>
-                          </TodoRight>
-                          :
-                          <TodoRight>
-                            <TodoEdit onClick={() => handleToggleEdit(todo.id) }>
-                            Edit
-                            </TodoEdit>
-      
-                            <TodoDelete onClick={ () => deleteTodo(todo.id) }>
-                              Del
-                            </TodoDelete>
-                          </TodoRight>
-                      }
-                      </TodoRight>
-                    </TodoItem>
-                  </div>
-                )
+                return displayTodos(todo)
               }
             })
-       }
+       }else if(activeStatus === 'search') {
+        // eslint-disable-next-line
+         return todos.map((todo) => {
+             if (todo.todo.indexOf(input.current.value) !== -1) {
+               return displayTodos(todo)
+             }
+           })
+      }
     }
 
 
@@ -343,34 +301,44 @@ function Todo() {
     <TodoWrapper>
       <TodoInputSection>
         <TodoTitle>
-        Things must be done
+          Things must be done
         </TodoTitle>
+
         <TodoInputField>
           <TodoInputBar ref={ input } value={ inputValue } onChange={ handleSetInputValue } placeholder="New Task" type="text" />
+
           <TodoBtnWrapper>
+
             <TodoRow>
               <TodoAdd onClick={() => addTodo(input.current.value)}>
                 Add
               </TodoAdd>
-              <TodoSearch>
+
+              <TodoSearch onClick={() => showSearch()}>
                 SEARCH
               </TodoSearch>
-              <TodoClearAll>
+
+              <TodoClearAll onClick={() => clearAll()}>
                 CLEARALL
               </TodoClearAll>
             </TodoRow>
+
             <TodoRow>
               <TodoAll onClick={() => showAll()}>
                 ALL
               </TodoAll>
+
               <TodoActive onClick={() => showActive()}>
                 ACTIVE
               </TodoActive>
+
               <TodoCompleted onClick={() => showDone()}>
                 COMPLETED
               </TodoCompleted>
             </TodoRow>
+
           </TodoBtnWrapper>
+
         </TodoInputField>
       </TodoInputSection>
 
