@@ -216,14 +216,12 @@ function Todo() {
               <TodoText className={"todo" + todo.id}>{todo.todo}</TodoText>
             )}
           </TodoLeft>
-
           <TodoRight>
             {todo.isEditing ? (
               <TodoRight>
                 <TodoSave onClick={() => handleSaveEdit(todo.id)}>
                   Save
                 </TodoSave>
-
                 <TodoCancell onClick={() => handleCancellEdit(todo.id)}>
                   Cancell
                 </TodoCancell>
@@ -237,7 +235,6 @@ function Todo() {
                 <TodoEdit onClick={() => handleToggleEdit(todo.id)}>
                   Edit
                 </TodoEdit>
-
                 <TodoDelete onClick={() => deleteTodo(todo.id)}>Del</TodoDelete>
               </TodoRight>
             )}
@@ -291,7 +288,6 @@ function Todo() {
     <TodoWrapper>
       <TodoInputSection>
         <TodoTitle>Things must be done</TodoTitle>
-
         <TodoInputField>
           <TodoInputBar
             ref={input}
@@ -300,23 +296,17 @@ function Todo() {
             placeholder="New Task"
             type="text"
           />
-
           <TodoBtnWrapper>
             <TodoRow>
               <TodoAdd onClick={() => addTodo(input.current.value)}>
                 Add
               </TodoAdd>
-
               <TodoSearch onClick={() => showSearch()}>SEARCH</TodoSearch>
-
               <TodoClearAll onClick={() => clearAll()}>CLEARALL</TodoClearAll>
             </TodoRow>
-
             <TodoRow>
               <TodoAll onClick={() => showAll()}>ALL</TodoAll>
-
               <TodoActive onClick={() => showActive()}>ACTIVE</TodoActive>
-
               <TodoCompleted onClick={() => showDone()}>
                 COMPLETED
               </TodoCompleted>
@@ -329,5 +319,4 @@ function Todo() {
     </TodoWrapper>
   );
 }
-
 export default Todo;
